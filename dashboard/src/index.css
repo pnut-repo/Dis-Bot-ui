@@ -191,6 +191,13 @@ body {
   min-height: 100vh;
   padding: var(--space-6);
   background: var(--color-bg-page);
+  position: relative;
+}
+
+.login-top-right {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
 }
 
 .login-center {

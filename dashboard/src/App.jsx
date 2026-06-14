@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import {
   SignedIn,
   SignedOut,
@@ -22,9 +22,162 @@ const NAV_ITEMS = [
   { id: "report", label: "AI Digest", icon: "🤖" },
 ];
 
-function LoginPage() {
+// ── Clerk Appearance Configs ────────────────────────────────────────────────
+
+const CLERK_DARK = {
+  variables: {
+    colorPrimary:         "#3B82F6",
+    colorBackground:      "#1a1c25",
+    colorText:            "#e5e7eb",
+    colorTextSecondary:   "#9CA3AF",
+    colorInputBackground: "#14151e",
+    colorInputText:       "#e5e7eb",
+    colorNeutral:         "#6B7280",
+    borderRadius:         "0.625rem",
+    fontFamily:           "Inter, sans-serif",
+    fontSize:             "14px",
+  },
+  elements: {
+    rootBox:   { width: "100%" },
+    card: {
+      background:   "#1a1c25",
+      border:       "1px solid #2a2d3a",
+      borderRadius: "14px",
+      boxShadow:    "0 4px 24px rgba(0,0,0,0.4)",
+      padding:      "20px",
+      width:        "100%",
+    },
+    headerTitle:    { color: "#e5e7eb", fontSize: "18px", fontWeight: "700" },
+    headerSubtitle: { color: "#9CA3AF" },
+    socialButtonsBlockButton: {
+      background:   "#14151e",
+      border:       "1px solid #2a2d3a",
+      color:        "#e5e7eb",
+      borderRadius: "10px",
+    },
+    socialButtonsBlockButtonText: { color: "#e5e7eb", fontWeight: "500" },
+    dividerLine:      { background: "#2a2d3a" },
+    dividerText:      { color: "#6B7280" },
+    formFieldLabel:   { color: "#9CA3AF" },
+    formFieldInput: {
+      background:   "#14151e",
+      border:       "1px solid #2a2d3a",
+      borderRadius: "10px",
+      color:        "#e5e7eb",
+    },
+    formFieldInput__focus:         { borderColor: "#3B82F6" },
+    formButtonPrimary:             { background: "#3B82F6", borderRadius: "10px", fontWeight: "600", boxShadow: "0 1px 3px rgba(59,130,246,0.40)" },
+    formButtonPrimary__hover:      { background: "#2563EB" },
+    footerActionLink:              { color: "#3B82F6" },
+    footerActionText:              { color: "#9CA3AF" },
+    footer:                        { background: "transparent" },
+    identityPreviewText:           { color: "#e5e7eb" },
+    identityPreviewEditButtonIcon: { color: "#3B82F6" },
+    userButtonPopoverCard:         { background: "#1a1c25", border: "1px solid #2a2d3a" },
+    userButtonPopoverActionButton: { color: "#e5e7eb" },
+    userButtonPopoverActionButtonText: { color: "#e5e7eb" },
+    userButtonPopoverActionButtonIcon: { color: "#9CA3AF" },
+    userButtonPopoverFooter:       { background: "transparent" },
+    avatarBox:                     { width: "32px", height: "32px" },
+  },
+};
+
+const CLERK_LIGHT = {
+  variables: {
+    colorPrimary:         "#2563EB",
+    colorBackground:      "#FFFFFF",
+    colorText:            "#111827",
+    colorTextSecondary:   "#6B7280",
+    colorInputBackground: "#F9FAFB",
+    colorInputText:       "#111827",
+    colorNeutral:         "#6B7280",
+    borderRadius:         "0.625rem",
+    fontFamily:           "Inter, sans-serif",
+    fontSize:             "14px",
+  },
+  elements: {
+    rootBox:   { width: "100%" },
+    card: {
+      background:   "#FFFFFF",
+      border:       "1px solid #E5E7EB",
+      borderRadius: "14px",
+      boxShadow:    "0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04)",
+      padding:      "20px",
+      width:        "100%",
+    },
+    headerTitle:    { color: "#111827", fontSize: "18px", fontWeight: "700" },
+    headerSubtitle: { color: "#6B7280" },
+    socialButtonsBlockButton: {
+      background:   "#F9FAFB",
+      border:       "1px solid #E5E7EB",
+      color:        "#111827",
+      borderRadius: "10px",
+    },
+    socialButtonsBlockButtonText: { color: "#111827", fontWeight: "500" },
+    dividerLine:      { background: "#E5E7EB" },
+    dividerText:      { color: "#9CA3AF" },
+    formFieldLabel:   { color: "#6B7280" },
+    formFieldInput: {
+      background:   "#F9FAFB",
+      border:       "1px solid #E5E7EB",
+      borderRadius: "10px",
+      color:        "#111827",
+    },
+    formFieldInput__focus:         { borderColor: "#2563EB" },
+    formButtonPrimary:             { background: "#2563EB", borderRadius: "10px", fontWeight: "600", boxShadow: "0 1px 3px rgba(37,99,235,0.30)" },
+    formButtonPrimary__hover:      { background: "#1D4ED8" },
+    footerActionLink:              { color: "#2563EB" },
+    footerActionText:              { color: "#6B7280" },
+    footer:                        { background: "transparent" },
+    identityPreviewText:           { color: "#111827" },
+    identityPreviewEditButtonIcon: { color: "#2563EB" },
+    userButtonPopoverCard:         { background: "#FFFFFF", border: "1px solid #E5E7EB" },
+    userButtonPopoverActionButton: { color: "#111827" },
+    userButtonPopoverActionButtonText: { color: "#111827" },
+    userButtonPopoverActionButtonIcon: { color: "#6B7280" },
+    userButtonPopoverFooter:       { background: "transparent" },
+    avatarBox:                     { width: "32px", height: "32px" },
+  },
+};
+
+// ── useTheme hook ───────────────────────────────────────────────────────────
+
+function useTheme() {
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem("dashboard-theme") || "dark";
+  });
+
+  useEffect(() => {
+    if (theme === "light") {
+      document.documentElement.setAttribute("data-theme", "light");
+    } else {
+      document.documentElement.removeAttribute("data-theme");
+    }
+    localStorage.setItem("dashboard-theme", theme);
+  }, [theme]);
+
+  const toggleTheme = useCallback(() => {
+    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+  }, []);
+
+  const clerkAppearance = useMemo(
+    () => (theme === "dark" ? CLERK_DARK : CLERK_LIGHT),
+    [theme]
+  );
+
+  return { theme, toggleTheme, clerkAppearance };
+}
+
+// ── LoginPage ───────────────────────────────────────────────────────────────
+
+function LoginPage({ theme, toggleTheme, clerkAppearance }) {
   return (
     <div className="login-page">
+      <div className="login-top-right">
+        <button className="theme-toggle" onClick={toggleTheme} aria-label="Toggle theme">
+          {theme === "dark" ? "☀️" : "🌙"}
+        </button>
+      </div>
       <div className="login-center">
         <div className="login-brand">
           <div className="login-logo-icon">M</div>
@@ -35,72 +188,7 @@ function LoginPage() {
         </div>
 
         <div className="login-clerk-wrap">
-          <SignIn
-            appearance={{
-              variables: {
-                colorPrimary:         "#3B82F6",
-                colorBackground:      "#1a1c25",
-                colorText:            "#e5e7eb",
-                colorTextSecondary:   "#9CA3AF",
-                colorInputBackground: "#14151e",
-                colorInputText:       "#e5e7eb",
-                colorNeutral:         "#6B7280",
-                borderRadius:         "0.625rem",
-                fontFamily:           "Inter, sans-serif",
-                fontSize:             "14px",
-              },
-              elements: {
-                rootBox: {
-                  width: "100%",
-                },
-                card: {
-                  background: "#1a1c25",
-                  border: "1px solid #2a2d3a",
-                  borderRadius: "14px",
-                  boxShadow: "0 4px 24px rgba(0,0,0,0.4)",
-                  padding: "20px",
-                  width: "100%",
-                },
-                headerTitle: {
-                  color: "#e5e7eb",
-                  fontSize: "18px",
-                  fontWeight: "700",
-                },
-                headerSubtitle: { color: "#9CA3AF" },
-                socialButtonsBlockButton: {
-                  background: "#14151e",
-                  border: "1px solid #2a2d3a",
-                  color: "#e5e7eb",
-                  borderRadius: "10px",
-                },
-                socialButtonsBlockButtonText: { color: "#e5e7eb", fontWeight: "500" },
-                dividerLine: { background: "#2a2d3a" },
-                dividerText: { color: "#6B7280" },
-                formFieldLabel: { color: "#9CA3AF" },
-                formFieldInput: {
-                  background: "#14151e",
-                  border: "1px solid #2a2d3a",
-                  borderRadius: "10px",
-                  color: "#e5e7eb",
-                },
-                formFieldInput__focus: { borderColor: "#3B82F6" },
-                formButtonPrimary: {
-                  background: "#3B82F6",
-                  borderRadius: "10px",
-                  fontWeight: "600",
-                  boxShadow: "0 1px 3px rgba(59,130,246,0.40)",
-                },
-                formButtonPrimary__hover: { background: "#2563EB" },
-                footerActionLink: { color: "#3B82F6" },
-                footerActionText: { color: "#9CA3AF" },
-                footer: {
-                  background: "transparent",
-                },
-                identityPreviewText: { color: "#e5e7eb" },
-                identityPreviewEditButtonIcon: { color: "#3B82F6" },
-              },
-            }}
-          />
+          <SignIn appearance={clerkAppearance} />
         </div>
 
         <p className="login-footer-note">
@@ -111,8 +199,9 @@ function LoginPage() {
   );
 }
 
+// ── Sidebar ─────────────────────────────────────────────────────────────────
 
-function Sidebar({ activeSection, onNavigate, dates, selected, onDateChange, user, mobileOpen }) {
+function Sidebar({ activeSection, onNavigate, dates, selected, onDateChange, user, mobileOpen, clerkAppearance }) {
   return (
     <aside className={`sidebar ${mobileOpen ? "open" : ""}`}>
       <div className="sidebar-brand">
@@ -149,13 +238,7 @@ function Sidebar({ activeSection, onNavigate, dates, selected, onDateChange, use
           </div>
         )}
         <div className="sidebar-user">
-          <UserButton
-            appearance={{
-              elements: {
-                avatarBox: { width: "32px", height: "32px" },
-              },
-            }}
-          />
+          <UserButton appearance={clerkAppearance} />
           {user && (
             <div className="sidebar-user-info">
               <div className="sidebar-user-name">{user.fullName || user.username || "User"}</div>
@@ -168,7 +251,9 @@ function Sidebar({ activeSection, onNavigate, dates, selected, onDateChange, use
   );
 }
 
-function Dashboard() {
+// ── Dashboard ───────────────────────────────────────────────────────────────
+
+function Dashboard({ theme, toggleTheme, clerkAppearance }) {
   const { getToken } = useAuth();
   const { user } = useUser();
 
@@ -181,25 +266,6 @@ function Dashboard() {
   const [hasLoggedLogin, setHasLoggedLogin] = useState(false);
   const [activeSection, setActiveSection] = useState("overview");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  // Theme: default is dark (no data-theme attribute = dark)
-  const [theme, setTheme] = useState(() => {
-    const saved = localStorage.getItem("dashboard-theme");
-    return saved || "dark";
-  });
-
-  useEffect(() => {
-    if (theme === "light") {
-      document.documentElement.setAttribute("data-theme", "light");
-    } else {
-      document.documentElement.removeAttribute("data-theme");
-    }
-    localStorage.setItem("dashboard-theme", theme);
-  }, [theme]);
-
-  const toggleTheme = useCallback(() => {
-    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
-  }, []);
 
   useEffect(() => {
     if (user && !hasLoggedLogin) {
@@ -285,6 +351,7 @@ function Dashboard() {
         onDateChange={handleDateChange}
         user={user}
         mobileOpen={mobileMenuOpen}
+        clerkAppearance={clerkAppearance}
       />
 
       <main className="main-content">
@@ -309,11 +376,7 @@ function Dashboard() {
               {theme === "dark" ? "☀️" : "🌙"}
             </button>
             {user && <span className="top-bar-user-name">{user.fullName || user.username}</span>}
-            <UserButton
-              appearance={{
-                elements: { avatarBox: { width: "32px", height: "32px" } },
-              }}
-            />
+            <UserButton appearance={clerkAppearance} />
           </div>
         </div>
 
@@ -368,14 +431,18 @@ function Dashboard() {
   );
 }
 
+// ── Root App ────────────────────────────────────────────────────────────────
+
 export default function App() {
+  const { theme, toggleTheme, clerkAppearance } = useTheme();
+
   return (
     <>
       <SignedOut>
-        <LoginPage />
+        <LoginPage theme={theme} toggleTheme={toggleTheme} clerkAppearance={clerkAppearance} />
       </SignedOut>
       <SignedIn>
-        <Dashboard />
+        <Dashboard theme={theme} toggleTheme={toggleTheme} clerkAppearance={clerkAppearance} />
       </SignedIn>
     </>
   );

@@ -16,100 +16,107 @@ import TopicList from "./components/TopicList";
 import NarrativeReport from "./components/NarrativeReport";
 
 const NAV_ITEMS = [
-  { id: "overview", label: "Overview", icon: "📊", description: "Summary cards & key metrics" },
-  { id: "charts", label: "Analytics", icon: "📈", description: "Charts & visualizations" },
-  { id: "topics", label: "Topics", icon: "💬", description: "Topic rankings & clusters" },
-  { id: "report", label: "AI Digest", icon: "🤖", description: "Groq narrative report" },
+  { id: "overview", label: "Overview", icon: "📊" },
+  { id: "charts", label: "Analytics", icon: "📈" },
+  { id: "topics", label: "Topics", icon: "💬" },
+  { id: "report", label: "AI Digest", icon: "🤖" },
 ];
 
 function LoginPage() {
   return (
     <div className="login-page">
-      <div className="login-container">
-        <div className="login-hero">
-          <div className="login-logo">
-            <div className="login-logo-icon">📊</div>
-            <span className="login-logo-text">Sentiment Dashboard</span>
+      <div className="login-center">
+        <div className="login-brand">
+          <div className="login-logo-icon">M</div>
+          <div>
+            <h1 className="login-title">Sentiment Dashboard</h1>
+            <p className="login-sub">AI-powered Discord community analytics</p>
           </div>
-          <p className="login-tagline">
-            AI-powered community analytics for your Discord server.
-            Track sentiment, discover trending topics, and understand your community.
-          </p>
-          <ul className="login-features">
-            <li>
-              <span className="login-feature-icon">🔍</span>
-              Real-time sentiment analysis powered by RoBERTa
-            </li>
-            <li>
-              <span className="login-feature-icon">🏷️</span>
-              Automatic topic clustering with HDBSCAN
-            </li>
-            <li>
-              <span className="login-feature-icon">🤖</span>
-              Daily AI-written narrative digests via Groq
-            </li>
-            <li>
-              <span className="login-feature-icon">📈</span>
-              Interactive charts and engagement scoring
-            </li>
-          </ul>
         </div>
-        <div className="login-form-wrapper">
+
+        <div className="login-clerk-wrap">
           <SignIn
             appearance={{
               variables: {
-                colorPrimary: "#f59e0b",
-                colorBackground: "#22223a",
-                colorText: "#e8e6f0",
-                colorInputBackground: "#16162a",
-                colorInputText: "#e8e6f0",
-                borderRadius: "0.6rem",
+                colorPrimary:         "#3B82F6",
+                colorBackground:      "#1a1c25",
+                colorText:            "#e5e7eb",
+                colorTextSecondary:   "#9CA3AF",
+                colorInputBackground: "#14151e",
+                colorInputText:       "#e5e7eb",
+                colorNeutral:         "#6B7280",
+                borderRadius:         "0.625rem",
+                fontFamily:           "Inter, sans-serif",
+                fontSize:             "14px",
               },
               elements: {
+                rootBox: {
+                  width: "100%",
+                },
                 card: {
-                  backgroundColor: "transparent",
-                  border: "none",
-                  boxShadow: "none",
+                  background: "#1a1c25",
+                  border: "1px solid #2a2d3a",
+                  borderRadius: "14px",
+                  boxShadow: "0 4px 24px rgba(0,0,0,0.4)",
+                  padding: "20px",
+                  width: "100%",
                 },
-                formButtonPrimary: {
-                  background: "linear-gradient(145deg, #f59e0b, #d97706)",
-                  color: "#1a1a2e",
-                  border: "none",
+                headerTitle: {
+                  color: "#e5e7eb",
+                  fontSize: "18px",
                   fontWeight: "700",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.15)",
                 },
+                headerSubtitle: { color: "#9CA3AF" },
                 socialButtonsBlockButton: {
-                  backgroundColor: "#16162a",
-                  border: "1px solid #3a3a58",
-                  color: "#e8e6f0",
-                  boxShadow: "0 2px 4px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04)",
+                  background: "#14151e",
+                  border: "1px solid #2a2d3a",
+                  color: "#e5e7eb",
+                  borderRadius: "10px",
                 },
-                footerActionLink: { color: "#f59e0b" },
-                headerTitle: { color: "#e8e6f0" },
-                headerSubtitle: { color: "#a09cb5" },
-                formFieldLabel: { color: "#a09cb5" },
+                socialButtonsBlockButtonText: { color: "#e5e7eb", fontWeight: "500" },
+                dividerLine: { background: "#2a2d3a" },
+                dividerText: { color: "#6B7280" },
+                formFieldLabel: { color: "#9CA3AF" },
                 formFieldInput: {
-                  backgroundColor: "#16162a",
-                  border: "1px solid #3a3a58",
-                  boxShadow: "inset 0 2px 4px rgba(0,0,0,0.3)",
+                  background: "#14151e",
+                  border: "1px solid #2a2d3a",
+                  borderRadius: "10px",
+                  color: "#e5e7eb",
                 },
-                dividerLine: { background: "#3a3a58" },
-                dividerText: { color: "#6e6a82" },
-                identityPreviewEditButton: { color: "#f59e0b" },
+                formFieldInput__focus: { borderColor: "#3B82F6" },
+                formButtonPrimary: {
+                  background: "#3B82F6",
+                  borderRadius: "10px",
+                  fontWeight: "600",
+                  boxShadow: "0 1px 3px rgba(59,130,246,0.40)",
+                },
+                formButtonPrimary__hover: { background: "#2563EB" },
+                footerActionLink: { color: "#3B82F6" },
+                footerActionText: { color: "#9CA3AF" },
+                footer: {
+                  background: "transparent",
+                },
+                identityPreviewText: { color: "#e5e7eb" },
+                identityPreviewEditButtonIcon: { color: "#3B82F6" },
               },
             }}
           />
         </div>
+
+        <p className="login-footer-note">
+          Sign in to view your server's daily analytics report
+        </p>
       </div>
     </div>
   );
 }
 
-function Sidebar({ activeSection, onNavigate, dates, selected, onDateChange, user }) {
+
+function Sidebar({ activeSection, onNavigate, dates, selected, onDateChange, user, mobileOpen }) {
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar ${mobileOpen ? "open" : ""}`}>
       <div className="sidebar-brand">
-        <div className="sidebar-icon">📊</div>
+        <div className="sidebar-icon">M</div>
         <div>
           <div className="sidebar-title">Sentiment</div>
           <div className="sidebar-subtitle">Dashboard</div>
@@ -175,7 +182,25 @@ function Dashboard() {
   const [activeSection, setActiveSection] = useState("overview");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Log login event once per session
+  // Theme: default is dark (no data-theme attribute = dark)
+  const [theme, setTheme] = useState(() => {
+    const saved = localStorage.getItem("dashboard-theme");
+    return saved || "dark";
+  });
+
+  useEffect(() => {
+    if (theme === "light") {
+      document.documentElement.setAttribute("data-theme", "light");
+    } else {
+      document.documentElement.removeAttribute("data-theme");
+    }
+    localStorage.setItem("dashboard-theme", theme);
+  }, [theme]);
+
+  const toggleTheme = useCallback(() => {
+    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+  }, []);
+
   useEffect(() => {
     if (user && !hasLoggedLogin) {
       logEvent(getToken, "login", {
@@ -187,7 +212,6 @@ function Dashboard() {
     }
   }, [user, hasLoggedLogin, getToken]);
 
-  // Load available dates on mount
   useEffect(() => {
     fetchReportDates()
       .then((d) => {
@@ -198,7 +222,6 @@ function Dashboard() {
       .finally(() => setLoading(false));
   }, []);
 
-  // Load report + topics when selected date changes
   useEffect(() => {
     if (!selected) return;
     setLoading(true);
@@ -249,7 +272,6 @@ function Dashboard() {
 
   return (
     <div className="app-shell">
-      {/* Mobile overlay */}
       <div
         className={`sidebar-overlay ${mobileMenuOpen ? "open" : ""}`}
         onClick={() => setMobileMenuOpen(false)}
@@ -262,60 +284,85 @@ function Dashboard() {
         selected={selected}
         onDateChange={handleDateChange}
         user={user}
+        mobileOpen={mobileMenuOpen}
       />
 
-      {/* Mobile header */}
-      <div className="mobile-header">
-        <button className="mobile-menu-btn" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-          ☰
-        </button>
-        <span style={{ fontWeight: 700, fontSize: "0.95rem" }}>Sentiment Dashboard</span>
-      </div>
-
       <main className="main-content">
-        <div className="page-header">
-          <h1 className="page-title">{currentPage.title}</h1>
-          <p className="page-subtitle">
-            {currentPage.subtitle}
-            {selected && ` · ${selected}`}
-          </p>
+        {/* Mobile header */}
+        <div className="mobile-header">
+          <button className="mobile-menu-btn" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+            ☰
+          </button>
+          <span style={{ fontWeight: 600, fontSize: 14, color: "var(--color-text-primary)" }}>Sentiment Dashboard</span>
+          <button className="theme-toggle" onClick={toggleTheme} aria-label="Toggle theme" style={{ marginLeft: "auto" }}>
+            {theme === "dark" ? "☀️" : "🌙"}
+          </button>
         </div>
 
-        {loading && (
-          <div className="loading-state">
-            <div className="spinner" />
-            <p>Loading dashboard data…</p>
+        {/* Top bar */}
+        <div className="top-bar">
+          <div className="top-bar-left">
+            <h1 className="page-title">{currentPage.title}</h1>
           </div>
-        )}
-
-        {error && !loading && (
-          <div className="error-state">
-            <p>⚠️ {error}</p>
-            <button onClick={() => window.location.reload()}>Retry</button>
+          <div className="top-bar-right">
+            <button className="theme-toggle" onClick={toggleTheme} aria-label="Toggle theme">
+              {theme === "dark" ? "☀️" : "🌙"}
+            </button>
+            {user && <span className="top-bar-user-name">{user.fullName || user.username}</span>}
+            <UserButton
+              appearance={{
+                elements: { avatarBox: { width: "32px", height: "32px" } },
+              }}
+            />
           </div>
-        )}
+        </div>
 
-        {!loading && !error && !report && (
-          <div className="empty-state">
-            <p>No reports available yet. The pipeline runs daily at 00:05 UTC.</p>
+        <div className="main-inner">
+          <div className="page-header">
+            <div>
+              <p className="page-subtitle">
+                {currentPage.subtitle}
+                {selected && ` · ${selected}`}
+              </p>
+            </div>
           </div>
-        )}
 
-        {!loading && !error && report && (
-          <>
-            {activeSection === "overview" && <SummaryCards report={report} />}
-            {activeSection === "charts" && <ChartView chartData={report.chart_data} />}
-            {activeSection === "topics" && <TopicList topics={topics} onTopicClick={handleTopicClick} />}
-            {activeSection === "report" && <NarrativeReport markdown={report.narrative_md} />}
-          </>
-        )}
+          {loading && (
+            <div className="loading-state">
+              <div className="spinner" />
+              <p>Loading dashboard data…</p>
+            </div>
+          )}
 
-        <footer className="app-footer">
-          <p>
-            Pipeline ran in {report?.pipeline_duration_seconds ?? "—"}s
-            {selected && ` · Report for ${selected}`}
-          </p>
-        </footer>
+          {error && !loading && (
+            <div className="error-state">
+              <p>⚠️ {error}</p>
+              <button onClick={() => window.location.reload()}>Retry</button>
+            </div>
+          )}
+
+          {!loading && !error && !report && (
+            <div className="empty-state">
+              <p>No reports available yet. The pipeline runs daily at 00:05 UTC.</p>
+            </div>
+          )}
+
+          {!loading && !error && report && (
+            <>
+              {activeSection === "overview" && <SummaryCards report={report} />}
+              {activeSection === "charts" && <ChartView key={theme} chartData={report.chart_data} />}
+              {activeSection === "topics" && <TopicList topics={topics} onTopicClick={handleTopicClick} />}
+              {activeSection === "report" && <NarrativeReport markdown={report.narrative_md} />}
+            </>
+          )}
+
+          <footer className="app-footer">
+            <p>
+              Pipeline ran in {report?.pipeline_duration_seconds ?? "—"}s
+              {selected && ` · Report for ${selected}`}
+            </p>
+          </footer>
+        </div>
       </main>
     </div>
   );

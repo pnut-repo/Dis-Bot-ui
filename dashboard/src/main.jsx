@@ -16,12 +16,24 @@ createRoot(document.getElementById("root")).render(
       publishableKey={PUBLISHABLE_KEY}
       appearance={{
         variables: {
-          colorPrimary: "#f59e0b",
-          colorBackground: "#22223a",
-          colorText: "#e8e6f0",
-          colorInputBackground: "#16162a",
-          colorInputText: "#e8e6f0",
-          borderRadius: "0.6rem",
+          colorPrimary: "#2563EB",
+          colorBackground: "#FFFFFF",
+          colorText: "#111827",
+          colorInputBackground: "#F9FAFB",
+          colorInputText: "#111827",
+          borderRadius: "0.625rem",
+        },
+        elements: {
+          card: {
+            backgroundColor: "transparent",
+            border: "none",
+            boxShadow: "none",
+          },
+          formButtonPrimary: {
+            background: "#2563EB",
+            boxShadow: "0 1px 3px rgba(37,99,235,0.30)",
+          },
+          footerActionLink: { color: "#2563EB" },
         },
       }}
     >

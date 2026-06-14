@@ -1,4 +1,4 @@
-export default function TopicList({ topics }) {
+export default function TopicList({ topics, onTopicClick }) {
   if (!topics || topics.length === 0) {
     return <p className="no-topics">No topics detected for this day.</p>;
   }
@@ -8,7 +8,7 @@ export default function TopicList({ topics }) {
       <h2>Topic Rankings</h2>
       <div className="topic-grid">
         {topics.map((t) => (
-          <div key={t.topic_rank} className="topic-card">
+          <div key={t.topic_rank} className="topic-card" onClick={() => onTopicClick?.(t)}>
             <div className="topic-header">
               <span className="topic-rank">#{t.topic_rank}</span>
               <span className="topic-name">{t.topic_name}</span>

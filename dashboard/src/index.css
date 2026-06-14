@@ -394,12 +394,65 @@ body {
   padding: 2rem;
 }
 
+/* ── Login Page ────────────────────────────────────────────────────────────── */
+.login-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+  gap: 2rem;
+  background: radial-gradient(
+    ellipse at 50% 0%,
+    rgba(99, 102, 241, 0.12) 0%,
+    transparent 60%
+  );
+}
+
+.login-branding {
+  text-align: center;
+}
+
+.login-branding h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  background: linear-gradient(135deg, var(--accent-indigo), var(--accent-violet));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.5rem;
+}
+
+.login-branding p {
+  color: var(--text-muted);
+  font-size: 1rem;
+}
+
+/* ── Header Right (DatePicker + UserButton) ─────────────────────────────────── */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* ── Topic Card Clickable ──────────────────────────────────────────────────── */
+.topic-card {
+  cursor: pointer;
+}
+
 /* ── Responsive ─────────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
   .app-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
+  }
+
+  .header-right {
+    width: 100%;
+    justify-content: space-between;
   }
 
   .summary-cards {
@@ -413,4 +466,9 @@ body {
   .topic-grid {
     grid-template-columns: 1fr;
   }
+
+  .login-branding h1 {
+    font-size: 1.5rem;
+  }
 }
+

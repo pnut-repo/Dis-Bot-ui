@@ -1,18 +1,43 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import {
+  SignedIn,
+  SignedOut,
+  SignIn,
+  UserButton,
+  useAuth,
+  useUser,
+} from "@clerk/clerk-react";
 import { fetchReportDates, fetchReport, fetchTopics } from "./api/client";
+import { logEvent } from "./api/audit";
 import DatePicker from "./components/DatePicker";
 import SummaryCards from "./components/SummaryCards";
 import ChartView from "./components/ChartView";
 import TopicList from "./components/TopicList";
 import NarrativeReport from "./components/NarrativeReport";
 
-export default function App() {
-  const [dates, setDates]       = useState([]);
+function Dashboard() {
+  const { getToken } = useAuth();
+  const { user } = useUser();
+
+  const [dates, setDates] = useState([]);
   const [selected, setSelected] = useState(null);
-  const [report, setReport]     = useState(null);
-  const [topics, setTopics]     = useState([]);
-  const [loading, setLoading]   = useState(true);
-  const [error, setError]       = useState(null);
+  const [report, setReport] = useState(null);
+  const [topics, setTopics] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [hasLoggedLogin, setHasLoggedLogin] = useState(false);
+
+  // Log login event once per session
+  useEffect(() => {
+    if (user && !hasLoggedLogin) {
+      logEvent(getToken, "login", {
+        email: user.primaryEmailAddress?.emailAddress,
+        name: user.fullName,
+        nickname: user.username,
+      });
+      setHasLoggedLogin(true);
+    }
+  }, [user, hasLoggedLogin, getToken]);
 
   // Load available dates on mount
   useEffect(() => {
@@ -34,10 +59,34 @@ export default function App() {
       .then(([r, t]) => {
         setReport(r);
         setTopics(t);
+        // Log view events
+        logEvent(getToken, "view_report", { report_date: selected });
+        logEvent(getToken, "view_topics", { report_date: selected });
       })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
-  }, [selected]);
+  }, [selected, getToken]);
+
+  // Date change handler with logging
+  const handleDateChange = useCallback(
+    (newDate) => {
+      setSelected(newDate);
+      logEvent(getToken, "change_date", { report_date: newDate });
+    },
+    [getToken]
+  );
+
+  // Topic card click handler
+  const handleTopicClick = useCallback(
+    (topic) => {
+      logEvent(getToken, "click_topic_card", {
+        report_date: selected,
+        topic_rank: topic.topic_rank,
+        topic_name: topic.topic_name,
+      });
+    },
+    [getToken, selected]
+  );
 
   return (
     <div className="app">
@@ -46,9 +95,22 @@ export default function App() {
           <h1>📊 Discord Sentiment Dashboard</h1>
           <p className="header-subtitle">AI-powered community analytics</p>
         </div>
-        {dates.length > 0 && (
-          <DatePicker dates={dates} selected={selected} onChange={setSelected} />
-        )}
+        <div className="header-right">
+          {dates.length > 0 && (
+            <DatePicker
+              dates={dates}
+              selected={selected}
+              onChange={handleDateChange}
+            />
+          )}
+          <UserButton
+            appearance={{
+              elements: {
+                avatarBox: { width: "36px", height: "36px" },
+              },
+            }}
+          />
+        </div>
       </header>
 
       <main className="app-main">
@@ -76,7 +138,7 @@ export default function App() {
           <>
             <SummaryCards report={report} />
             <ChartView chartData={report.chart_data} />
-            <TopicList topics={topics} />
+            <TopicList topics={topics} onTopicClick={handleTopicClick} />
             <NarrativeReport markdown={report.narrative_md} />
           </>
         )}
@@ -89,5 +151,35 @@ export default function App() {
         </p>
       </footer>
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <>
+      <SignedOut>
+        <div className="login-page">
+          <div className="login-branding">
+            <h1>📊 Discord Sentiment Dashboard</h1>
+            <p>AI-powered community analytics — sign in to continue</p>
+          </div>
+          <SignIn
+            appearance={{
+              elements: {
+                rootBox: { width: "100%" },
+                card: {
+                  backgroundColor: "#1e293b",
+                  border: "1px solid #334155",
+                  boxShadow: "0 8px 32px rgba(0, 0, 0, 0.4)",
+                },
+              },
+            }}
+          />
+        </div>
+      </SignedOut>
+      <SignedIn>
+        <Dashboard />
+      </SignedIn>
+    </>
   );
 }

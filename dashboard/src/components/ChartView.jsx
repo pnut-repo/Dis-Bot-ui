@@ -39,10 +39,10 @@ export default function ChartView({ chartData }) {
             <XAxis dataKey="hour" stroke="#94a3b8" fontSize={12} />
             <YAxis stroke="#94a3b8" fontSize={12} />
             <Tooltip
-              contentStyle={{ background: "#1e293b", border: "1px solid #334155", borderRadius: 8 }}
-              labelStyle={{ color: "#94a3b8" }}
+              contentStyle={{ background: "#22223a", border: "1px solid #3a3a58", borderRadius: 10 }}
+              labelStyle={{ color: "#a09cb5" }}
             />
-            <Bar dataKey="count" fill="#6366f1" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="count" fill="#f59e0b" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </section>
@@ -81,7 +81,7 @@ export default function ChartView({ chartData }) {
             <XAxis dataKey="hour" stroke="#94a3b8" fontSize={12} />
             <YAxis stroke="#94a3b8" fontSize={12} />
             <Tooltip
-              contentStyle={{ background: "#1e293b", border: "1px solid #334155", borderRadius: 8 }}
+              contentStyle={{ background: "#22223a", border: "1px solid #3a3a58", borderRadius: 10 }}
             />
             <Area type="monotone" dataKey="positive" stackId="1" stroke={COLORS.positive} fill={COLORS.positive} fillOpacity={0.6} />
             <Area type="monotone" dataKey="neutral"  stackId="1" stroke={COLORS.neutral}  fill={COLORS.neutral}  fillOpacity={0.4} />
@@ -97,12 +97,12 @@ export default function ChartView({ chartData }) {
           <ResponsiveContainer width="100%" height={Math.max(300, topic_engagement.length * 40)}>
             <BarChart data={topic_engagement} layout="vertical">
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-              <XAxis type="number" stroke="#94a3b8" fontSize={12} />
-              <YAxis dataKey="name" type="category" width={160} stroke="#94a3b8" fontSize={11} />
+                <XAxis type="number" stroke="#a09cb5" fontSize={12} />
+                <YAxis dataKey="name" type="category" width={160} stroke="#a09cb5" fontSize={11} />
               <Tooltip
                 contentStyle={{ background: "#1e293b", border: "1px solid #334155", borderRadius: 8 }}
               />
-              <Bar dataKey="engagement_score" fill="#8b5cf6" radius={[0, 4, 4, 0]} />
+                <Bar dataKey="engagement_score" fill="#14b8a6" radius={[0, 4, 4, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </section>
@@ -115,8 +115,8 @@ export default function ChartView({ chartData }) {
           <ResponsiveContainer width="100%" height={Math.max(300, user_activity.length * 35)}>
             <BarChart data={user_activity} layout="vertical">
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-              <XAxis type="number" stroke="#94a3b8" fontSize={12} />
-              <YAxis dataKey="username" type="category" width={120} stroke="#94a3b8" fontSize={12} />
+                <XAxis type="number" stroke="#a09cb5" fontSize={12} />
+                <YAxis dataKey="username" type="category" width={120} stroke="#a09cb5" fontSize={12} />
               <Tooltip
                 contentStyle={{ background: "#1e293b", border: "1px solid #334155", borderRadius: 8 }}
               />

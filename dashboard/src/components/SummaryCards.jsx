@@ -2,9 +2,9 @@ export default function SummaryCards({ report }) {
   const { total_messages, total_users, total_topics, overall_sentiment } = report;
 
   const cards = [
-    { value: total_messages?.toLocaleString() ?? "—", label: "Messages", icon: "💬", color: "var(--accent-indigo)" },
-    { value: total_users ?? "—", label: "Active Users", icon: "👥", color: "var(--accent-cyan)" },
-    { value: total_topics ?? "—", label: "Topics", icon: "🏷️", color: "var(--accent-violet)" },
+    { value: total_messages?.toLocaleString() ?? "—", label: "Messages", icon: "💬", color: "var(--accent-amber)" },
+    { value: total_users ?? "—", label: "Active Users", icon: "👥", color: "var(--accent-teal)" },
+    { value: total_topics ?? "—", label: "Topics", icon: "🏷️", color: "var(--accent-sky)" },
     {
       value: overall_sentiment ? `${Math.round(overall_sentiment.positive * 100)}%` : "—",
       label: "Positive",

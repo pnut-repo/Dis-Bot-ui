@@ -7,7 +7,7 @@ import {
   useAuth,
   useUser,
 } from "@clerk/clerk-react";
-import { fetchReportDates, fetchReport, fetchTopics } from "./api/client";
+import { fetchReportDates, fetchReport, fetchTopics, fetchAnalytics } from "./api/client";
 import { logEvent } from "./api/audit";
 import DatePicker from "./components/DatePicker";
 import SummaryCards from "./components/SummaryCards";
@@ -261,6 +261,7 @@ function Dashboard({ theme, toggleTheme, clerkAppearance }) {
   const [selected, setSelected] = useState(null);
   const [report, setReport] = useState(null);
   const [topics, setTopics] = useState([]);
+  const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [hasLoggedLogin, setHasLoggedLogin] = useState(false);
@@ -292,12 +293,12 @@ function Dashboard({ theme, toggleTheme, clerkAppearance }) {
     if (!selected) return;
     setLoading(true);
     setError(null);
-    Promise.all([fetchReport(selected), fetchTopics(selected)])
-      .then(([r, t]) => {
+    Promise.all([fetchReport(selected), fetchTopics(selected), fetchAnalytics(selected)])
+      .then(([r, t, a]) => {
         setReport(r);
         setTopics(t);
+        setAnalytics(a);
         logEvent(getToken, "view_report", { report_date: selected });
-        logEvent(getToken, "view_topics", { report_date: selected });
       })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
@@ -413,7 +414,7 @@ function Dashboard({ theme, toggleTheme, clerkAppearance }) {
           {!loading && !error && report && (
             <>
               {activeSection === "overview" && <SummaryCards report={report} />}
-              {activeSection === "charts" && <ChartView key={theme} chartData={report.chart_data} />}
+              {activeSection === "charts" && <ChartView key={theme} chartData={report.chart_data} analytics={analytics} />}
               {activeSection === "topics" && <TopicList topics={topics} onTopicClick={handleTopicClick} />}
               {activeSection === "report" && <NarrativeReport markdown={report.narrative_md} />}
             </>

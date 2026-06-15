@@ -19,3 +19,16 @@ export async function fetchTopics(date) {
   const data = await res.json();
   return data.topics;
 }
+
+export async function fetchUserStats(date) {
+  const res = await fetch(`${API_BASE}/api/users/${date}`);
+  if (!res.ok) throw new Error(`No user stats for ${date}`);
+  const data = await res.json();
+  return data.users;
+}
+
+export async function fetchAnalytics(date) {
+  const res = await fetch(`${API_BASE}/api/analytics/${date}`);
+  if (!res.ok) return null; // Analytics may not exist for older dates
+  return res.json();
+}

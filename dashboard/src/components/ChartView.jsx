@@ -1,6 +1,6 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
-  BarChart, Bar, AreaChart, Area, PieChart, Pie, Cell,
+  BarChart, Bar, AreaChart, Area, PieChart, Pie, Cell, LineChart, Line,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend,
   ResponsiveContainer,
 } from "recharts";
@@ -10,7 +10,9 @@ function cssVar(name) {
   return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 }
 
-export default function ChartView({ chartData }) {
+export default function ChartView({ chartData, analytics }) {
+  const [selectedUser, setSelectedUser] = useState("");
+
   if (!chartData) return null;
 
   /* Resolve CSS variables at render so they follow the active theme */
@@ -20,6 +22,7 @@ export default function ChartView({ chartData }) {
     return {
       chart1:  cssVar("--chart-1"),
       chart2:  cssVar("--chart-2"),
+      chart3:  cssVar("--chart-3") || "#a855f7",
       chart4:  cssVar("--chart-4"),
       grid:    cssVar("--chart-grid"),
       axis:    cssVar("--chart-axis"),
@@ -48,6 +51,7 @@ export default function ChartView({ chartData }) {
     sentiment_by_hour,
     topic_engagement,
     user_activity,
+    user_detail,
   } = chartData;
 
   const pieData = [
@@ -58,20 +62,58 @@ export default function ChartView({ chartData }) {
 
   const PIE_COLORS = [theme.success, theme.neutral, theme.danger];
 
+  // Get user detail from either chart_data or analytics API
+  const userDetailData = user_detail || (analytics && analytics.user_analytics) || {};
+  const userList = Object.keys(userDetailData).sort();
+  const currentUserData = selectedUser ? userDetailData[selectedUser] : null;
+
+  // User sentiment pie
+  const userPieData = currentUserData ? [
+    { name: "Positive", value: currentUserData.sentiment.positive },
+    { name: "Neutral",  value: currentUserData.sentiment.neutral },
+    { name: "Negative", value: currentUserData.sentiment.negative },
+  ] : null;
+
   return (
     <div className="charts" id="chart-view">
 
-      {/* 1. Hourly Message Volume */}
-      <section className="chart-section">
-        <h3>Message Volume by Hour</h3>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={hourly_volume}>
+      {/* 1. Message Timeline — 24h Activity Curve */}
+      <section className="chart-section chart-section-wide">
+        <h3>📈 Message Timeline — 24h Activity</h3>
+        <p className="chart-subtitle">
+          Message volume throughout the day. Peaks indicate active discussion periods.
+        </p>
+        <ResponsiveContainer width="100%" height={320}>
+          <AreaChart data={hourly_volume}>
+            <defs>
+              <linearGradient id="activityGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor={theme.chart1} stopOpacity={0.3} />
+                <stop offset="95%" stopColor={theme.chart1} stopOpacity={0.02} />
+              </linearGradient>
+            </defs>
             <CartesianGrid strokeDasharray="3 3" stroke={theme.grid} vertical={false} />
-            <XAxis dataKey="hour" stroke={theme.axis} fontSize={12} />
+            <XAxis
+              dataKey="hour"
+              stroke={theme.axis}
+              fontSize={12}
+              tickFormatter={(h) => `${String(h).padStart(2, "0")}:00`}
+            />
             <YAxis stroke={theme.axis} fontSize={12} />
-            <Tooltip contentStyle={tooltipStyle} labelStyle={{ color: theme.axis }} />
-            <Bar dataKey="count" fill={theme.chart1} radius={[4, 4, 0, 0]} />
-          </BarChart>
+            <Tooltip
+              contentStyle={tooltipStyle}
+              labelFormatter={(h) => `${String(h).padStart(2, "0")}:00 — ${String(h).padStart(2, "0")}:59`}
+            />
+            <Area
+              type="monotoneX"
+              dataKey="count"
+              stroke={theme.chart1}
+              fill="url(#activityGradient)"
+              strokeWidth={2.5}
+              dot={{ r: 3, fill: theme.chart1, strokeWidth: 0 }}
+              activeDot={{ r: 6, stroke: theme.chart1, strokeWidth: 2, fill: theme.tooltipBg }}
+              name="Messages"
+            />
+          </AreaChart>
         </ResponsiveContainer>
       </section>
 
@@ -106,7 +148,12 @@ export default function ChartView({ chartData }) {
         <ResponsiveContainer width="100%" height={300}>
           <AreaChart data={sentiment_by_hour}>
             <CartesianGrid strokeDasharray="3 3" stroke={theme.grid} vertical={false} />
-            <XAxis dataKey="hour" stroke={theme.axis} fontSize={12} />
+            <XAxis
+              dataKey="hour"
+              stroke={theme.axis}
+              fontSize={12}
+              tickFormatter={(h) => `${String(h).padStart(2, "0")}:00`}
+            />
             <YAxis stroke={theme.axis} fontSize={12} />
             <Tooltip contentStyle={tooltipStyle} />
             <Area type="monotone" dataKey="positive" stackId="1" stroke={theme.success} fill={theme.success} fillOpacity={0.12} strokeWidth={2} />
@@ -132,7 +179,7 @@ export default function ChartView({ chartData }) {
         </section>
       )}
 
-      {/* 5. User Activity */}
+      {/* 5. Most Active Users */}
       {user_activity && user_activity.length > 0 && (
         <section className="chart-section chart-section-wide">
           <h3>Most Active Users</h3>
@@ -145,6 +192,117 @@ export default function ChartView({ chartData }) {
               <Bar dataKey="message_count" fill={theme.chart4} radius={[0, 4, 4, 0]} />
             </BarChart>
           </ResponsiveContainer>
+        </section>
+      )}
+
+      {/* 6. User Dropdown Analytics */}
+      {userList.length > 0 && (
+        <section className="chart-section chart-section-wide user-analytics-section">
+          <div className="user-analytics-header">
+            <h3>👤 User Analytics</h3>
+            <select
+              className="user-select"
+              value={selectedUser}
+              onChange={(e) => setSelectedUser(e.target.value)}
+              id="user-analytics-dropdown"
+            >
+              <option value="">Select a user...</option>
+              {userList.map((u) => (
+                <option key={u} value={u}>{u} ({userDetailData[u].message_count} msgs)</option>
+              ))}
+            </select>
+          </div>
+
+          {currentUserData && (
+            <div className="user-analytics-grid">
+              {/* User Activity Timeline */}
+              <div className="user-chart-card">
+                <h4>{selectedUser}'s Activity Timeline</h4>
+                <ResponsiveContainer width="100%" height={220}>
+                  <AreaChart data={currentUserData.hourly_activity}>
+                    <defs>
+                      <linearGradient id="userActivityGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor={theme.chart3} stopOpacity={0.3} />
+                        <stop offset="95%" stopColor={theme.chart3} stopOpacity={0.02} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke={theme.grid} vertical={false} />
+                    <XAxis
+                      dataKey="hour"
+                      stroke={theme.axis}
+                      fontSize={11}
+                      tickFormatter={(h) => `${String(h).padStart(2, "0")}:00`}
+                    />
+                    <YAxis stroke={theme.axis} fontSize={11} />
+                    <Tooltip
+                      contentStyle={tooltipStyle}
+                      labelFormatter={(h) => `${String(h).padStart(2, "0")}:00`}
+                    />
+                    <Area
+                      type="monotoneX"
+                      dataKey="count"
+                      stroke={theme.chart3}
+                      fill="url(#userActivityGrad)"
+                      strokeWidth={2}
+                      dot={{ r: 2, fill: theme.chart3 }}
+                      name="Messages"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+
+              {/* User Sentiment Pie */}
+              <div className="user-chart-card">
+                <h4>{selectedUser}'s Sentiment</h4>
+                <ResponsiveContainer width="100%" height={220}>
+                  <PieChart>
+                    <Pie
+                      data={userPieData}
+                      dataKey="value"
+                      nameKey="name"
+                      cx="50%" cy="50%"
+                      outerRadius={70}
+                      innerRadius={40}
+                      paddingAngle={3}
+                      label={({ name, value }) => `${name} ${Math.round(value * 100)}%`}
+                    >
+                      {userPieData.map((entry, i) => (
+                        <Cell key={entry.name} fill={PIE_COLORS[i]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+
+              {/* User Stats Cards */}
+              <div className="user-chart-card user-stats-card">
+                <h4>Stats</h4>
+                <div className="user-stat-row">
+                  <span className="user-stat-label">Messages</span>
+                  <span className="user-stat-value">{currentUserData.message_count}</span>
+                </div>
+                <div className="user-stat-row">
+                  <span className="user-stat-label">Active Hours</span>
+                  <span className="user-stat-value">{currentUserData.active_hours?.length || 0}</span>
+                </div>
+                <div className="user-stat-row">
+                  <span className="user-stat-label">Topics Joined</span>
+                  <span className="user-stat-value">{currentUserData.topics?.length || 0}</span>
+                </div>
+                {currentUserData.topics && currentUserData.topics.length > 0 && (
+                  <div className="user-topics-list">
+                    <span className="user-stat-label">Topics:</span>
+                    <div className="user-topic-tags">
+                      {currentUserData.topics.map((t, i) => (
+                        <span key={i} className="user-topic-tag">{t}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </section>
       )}
 

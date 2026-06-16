@@ -6,12 +6,23 @@ export default function TopicList({ topics, onTopicClick }) {
   return (
     <div className="topic-list" id="topic-list">
       <h2>Topic Rankings</h2>
+      <div className="sentiment-legend">
+        {['excited', 'happy', 'curious', 'neutral', 'frustrated', 'angry', 'sad', 'confused'].map(s => (
+          <span key={s} className="legend-item">
+            <span className={`legend-color ${s}`}></span>
+            {s}
+          </span>
+        ))}
+      </div>
       <div className="topic-grid">
-        {topics.map((t) => (
+        {topics.map((t) => {
+          const dominantSentiment = Object.entries(t.sentiment_dist || {}).sort((a, b) => b[1] - a[1])[0]?.[0] || 'neutral';
+          return (
           <div key={t.topic_rank} className="topic-card" onClick={() => onTopicClick?.(t)}>
             <div className="topic-header">
               <span className="topic-rank">#{t.topic_rank}</span>
               <span className="topic-name">{t.topic_name}</span>
+              <span className="topic-dominant-sentiment">{dominantSentiment}</span>
               <span className="topic-score">
                 {(t.engagement_score * 100).toFixed(0)}%
               </span>
@@ -26,24 +37,21 @@ export default function TopicList({ topics, onTopicClick }) {
               Started by <strong>{t.initiator_username}</strong>
             </div>
             <div className="topic-sentiment-bar">
-              <div
-                className="sentiment-segment positive"
-                style={{ width: `${t.sentiment_dist.positive * 100}%` }}
-                title={`Positive: ${Math.round(t.sentiment_dist.positive * 100)}%`}
-              />
-              <div
-                className="sentiment-segment neutral"
-                style={{ width: `${t.sentiment_dist.neutral * 100}%` }}
-                title={`Neutral: ${Math.round(t.sentiment_dist.neutral * 100)}%`}
-              />
-              <div
-                className="sentiment-segment negative"
-                style={{ width: `${t.sentiment_dist.negative * 100}%` }}
-                title={`Negative: ${Math.round(t.sentiment_dist.negative * 100)}%`}
-              />
+              {['excited', 'happy', 'curious', 'neutral', 'frustrated', 'angry', 'sad', 'confused'].map(sentiment => {
+                const val = t.sentiment_dist[sentiment] || 0;
+                if (val === 0) return null;
+                return (
+                  <div
+                    key={sentiment}
+                    className={`sentiment-segment ${sentiment}`}
+                    style={{ width: `${val * 100}%` }}
+                    title={`${sentiment.charAt(0).toUpperCase() + sentiment.slice(1)}: ${Math.round(val * 100)}%`}
+                  />
+                );
+              })}
             </div>
           </div>
-        ))}
+        )})}
       </div>
     </div>
   );

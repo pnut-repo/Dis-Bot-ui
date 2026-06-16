@@ -844,9 +844,55 @@ body {
 }
 
 .sentiment-segment { transition: width 400ms ease-out; }
-.sentiment-segment.positive { background: var(--color-success); }
-.sentiment-segment.neutral  { background: var(--color-neutral); }
-.sentiment-segment.negative { background: var(--color-danger); }
+.sentiment-segment.excited    { background: #f59e0b; }
+.sentiment-segment.happy      { background: #22c55e; }
+.sentiment-segment.curious    { background: #06b6d4; }
+.sentiment-segment.neutral    { background: #6b7280; }
+.sentiment-segment.frustrated { background: #f97316; }
+.sentiment-segment.angry      { background: #ef4444; }
+.sentiment-segment.sad        { background: #8b5cf6; }
+.sentiment-segment.confused   { background: #ec4899; }
+
+/* ── Sentiment Legend & Badges ─────────────────────────────────────────────── */
+.sentiment-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  text-transform: capitalize;
+}
+.legend-color {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.legend-color.excited    { background: #f59e0b; }
+.legend-color.happy      { background: #22c55e; }
+.legend-color.curious    { background: #06b6d4; }
+.legend-color.neutral    { background: #6b7280; }
+.legend-color.frustrated { background: #f97316; }
+.legend-color.angry      { background: #ef4444; }
+.legend-color.sad        { background: #8b5cf6; }
+.legend-color.confused   { background: #ec4899; }
+
+.topic-dominant-sentiment {
+  margin-left: auto;
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  font-weight: 600;
+  background: var(--color-bg-page);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+}
 
 /* ── Narrative Report ──────────────────────────────────────────────────────── */
 .narrative-report { margin-bottom: var(--space-4); }

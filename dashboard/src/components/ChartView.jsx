@@ -54,13 +54,25 @@ export default function ChartView({ chartData, analytics }) {
     user_detail,
   } = chartData;
 
-  const pieData = [
-    { name: "Positive", value: sentiment_overview.positive },
-    { name: "Neutral",  value: sentiment_overview.neutral },
-    { name: "Negative", value: sentiment_overview.negative },
-  ];
+  const sentimentKeys = ["excited", "happy", "curious", "neutral", "frustrated", "angry", "sad", "confused"];
+  const sentimentColors = {
+    excited: "#f59e0b",
+    happy: "#22c55e",
+    curious: "#06b6d4",
+    neutral: "#6b7280",
+    frustrated: "#f97316",
+    angry: "#ef4444",
+    sad: "#8b5cf6",
+    confused: "#ec4899",
+  };
 
-  const PIE_COLORS = [theme.success, theme.neutral, theme.danger];
+  const pieData = sentimentKeys
+    .map(key => ({
+      name: key.charAt(0).toUpperCase() + key.slice(1),
+      value: sentiment_overview[key] || 0,
+      color: sentimentColors[key]
+    }))
+    .filter(d => d.value > 0);
 
   // Get user detail from either chart_data or analytics API
   const userDetailData = user_detail || (analytics && analytics.user_analytics) || {};
@@ -68,11 +80,13 @@ export default function ChartView({ chartData, analytics }) {
   const currentUserData = selectedUser ? userDetailData[selectedUser] : null;
 
   // User sentiment pie
-  const userPieData = currentUserData ? [
-    { name: "Positive", value: currentUserData.sentiment.positive },
-    { name: "Neutral",  value: currentUserData.sentiment.neutral },
-    { name: "Negative", value: currentUserData.sentiment.negative },
-  ] : null;
+  const userPieData = currentUserData ? sentimentKeys
+    .map(key => ({
+      name: key.charAt(0).toUpperCase() + key.slice(1),
+      value: currentUserData.sentiment[key] || 0,
+      color: sentimentColors[key]
+    }))
+    .filter(d => d.value > 0) : null;
 
   return (
     <div className="charts" id="chart-view">
@@ -132,8 +146,8 @@ export default function ChartView({ chartData, analytics }) {
               paddingAngle={3}
               label={({ name, value }) => `${name} ${Math.round(value * 100)}%`}
             >
-              {pieData.map((entry, i) => (
-                <Cell key={entry.name} fill={PIE_COLORS[i]} />
+              {pieData.map((entry) => (
+                <Cell key={entry.name} fill={entry.color} />
               ))}
             </Pie>
             <Tooltip />
@@ -156,9 +170,19 @@ export default function ChartView({ chartData, analytics }) {
             />
             <YAxis stroke={theme.axis} fontSize={12} />
             <Tooltip contentStyle={tooltipStyle} />
-            <Area type="monotone" dataKey="positive" stackId="1" stroke={theme.success} fill={theme.success} fillOpacity={0.12} strokeWidth={2} />
-            <Area type="monotone" dataKey="neutral"  stackId="1" stroke={theme.neutral}  fill={theme.neutral}  fillOpacity={0.08} strokeWidth={2} />
-            <Area type="monotone" dataKey="negative" stackId="1" stroke={theme.danger}   fill={theme.danger}   fillOpacity={0.12} strokeWidth={2} />
+            {sentimentKeys.map(key => (
+              <Area
+                key={key}
+                type="monotone"
+                dataKey={key}
+                stackId="1"
+                stroke={sentimentColors[key]}
+                fill={sentimentColors[key]}
+                fillOpacity={0.1}
+                strokeWidth={2}
+                name={key.charAt(0).toUpperCase() + key.slice(1)}
+              />
+            ))}
           </AreaChart>
         </ResponsiveContainer>
       </section>
@@ -266,8 +290,8 @@ export default function ChartView({ chartData, analytics }) {
                       paddingAngle={3}
                       label={({ name, value }) => `${name} ${Math.round(value * 100)}%`}
                     >
-                      {userPieData.map((entry, i) => (
-                        <Cell key={entry.name} fill={PIE_COLORS[i]} />
+                      {userPieData.map((entry) => (
+                        <Cell key={entry.name} fill={entry.color} />
                       ))}
                     </Pie>
                     <Tooltip />

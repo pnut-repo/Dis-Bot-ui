@@ -6,7 +6,9 @@ export default function SummaryCards({ report }) {
     { value: total_users ?? "—", label: "Active Users", icon: "👥" },
     { value: total_topics ?? "—", label: "Topics", icon: "🏷️" },
     {
-      value: overall_sentiment ? `${Math.round(overall_sentiment.positive * 100)}%` : "—",
+      value: overall_sentiment
+        ? `${Math.round(((overall_sentiment.excited || 0) + (overall_sentiment.happy || 0)) * 100)}%`
+        : "—",
       label: "Positive Sentiment",
       icon: "😊",
     },
